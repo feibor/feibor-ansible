@@ -1,0 +1,11 @@
+- name: Create directories
+  # file: name={{ item }} state=directory
+  copy: src={{ item }} dest={{ cluster_dir }}/down mode=755
+  with_items:
+  - "{{cluster_dir}}/down/images"
+  - "{{cluster_dir}}/down/ctrimages"
+
+- name: Use ctr command to load images located in {{cluster_dir}}/down/ctrimages
+  ansible.builtin.shell: |
+    cd {{cluster_dir}}/down/ctrimages
+    ls -l | grep "gz" | awk '{print $9}' | xargs -I {} ctr -n k8s.io images import {}

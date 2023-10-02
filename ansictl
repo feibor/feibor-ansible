@@ -1,0 +1,191 @@
+#!/bin/bash
+#--------------------------------------------------
+# This script is used for: 
+# 1. to run feibor-ansible in a container (recommended)
+# @author:   lipengfei
+# @usage:    ./ansidown.sh
+# @repo:     https://github.com/feibor/feibor-ansible
+#--------------------------------------------------
+
+set -o nounset
+set -o errexit
+
+EZANSI=1.0.0
+BASE=/etc/ezansi
+
+# Constants
+RESET='\033[0m'
+RED='\033[38;5;1m'
+GREEN='\033[38;5;2m'
+YELLOW='\033[38;5;3m'
+MAGENTA='\033[38;5;5m'
+CYAN='\033[38;5;6m'
+
+# Functions
+
+########################
+# Print to STDERR
+# Arguments:
+#   Message to print
+# Returns:
+#   None
+#########################
+stderr_print() {
+    # 'is_boolean_yes' is defined in libvalidations.sh, but depends on this file so we cannot source it
+    local bool="${BITNAMI_QUIET:-false}"
+    # comparison is performed without regard to the case of alphabetic characters
+    shopt -s nocasematch
+    if ! [[ "$bool" = 1 || "$bool" =~ ^(yes|true)$ ]]; then
+        printf "%b\\n" "${*}" >&2
+    fi
+}
+
+########################
+# Log message
+# Arguments:
+#   Message to log
+# Returns:
+#   None
+#########################
+log() {
+    stderr_print "${CYAN}${MODULE:-} ${MAGENTA}$(date "+%T.%2N ")${RESET}${*}"
+}
+########################
+# Log an 'info' message
+# Arguments:
+#   Message to log
+# Returns:
+#   None
+#########################
+info() {
+    log "${GREEN}INFO ${RESET} ==> ${*}"
+}
+########################
+# Log message
+# Arguments:
+#   Message to log
+# Returns:
+#   None
+#########################
+warn() {
+    log "${YELLOW}WARN ${RESET} ==> ${*}"
+}
+########################
+# Log an 'error' message
+# Arguments:
+#   Message to log
+# Returns:
+#   None
+#########################
+error() {
+    log "${RED}ERROR${RESET} ==> ${*}"
+}
+########################
+# Log a 'debug' message
+# Globals:
+#   BITNAMI_DEBUG
+# Arguments:
+#   None
+# Returns:
+#   None
+#########################
+debug() {
+    # 'is_boolean_yes' is defined in libvalidations.sh, but depends on this file so we cannot source it
+    local bool="${BITNAMI_DEBUG:-false}"
+    # comparison is performed without regard to the case of alphabetic characters
+    shopt -s nocasematch
+    if [[ "$bool" = 1 || "$bool" =~ ^(yes|true)$ ]]; then
+        log "${MAGENTA}DEBUG${RESET} ==> ${*}"
+    fi
+}
+
+########################
+# Indent a string
+# Arguments:
+#   $1 - string
+#   $2 - number of indentation characters (default: 4)
+#   $3 - indentation character (default: " ")
+# Returns:
+#   None
+#########################
+indent() {
+    local string="${1:-}"
+    local num="${2:?missing num}"
+    local char="${3:-" "}"
+    # Build the indentation unit string
+    local indent_unit=""
+    for ((i = 0; i < num; i++)); do
+        indent_unit="${indent_unit}${char}"
+    done
+    # shellcheck disable=SC2001
+    # Complex regex, see https://github.com/koalaman/shellcheck/wiki/SC2001#exceptions
+    echo "$string" | sed "s/^/${indent_unit}/"
+}
+
+
+
+function usage() {
+    echo -e "\033[33mUsage:\033[0m ezctl COMMAND [args]"
+    cat <<EOF
+-------------------------------------------------------------------------------------
+Use "ezansi <command>"
+EOF
+}
+
+function new() {
+    # check if already existed
+    [[ -d "clusters/$1" ]] && { error "cluster:$1 already existed, if cluster:$1 setup failed, try 'rm -rf $BASE/clusters/$1' first!"; exit 1; }
+    
+    info "generate custom cluster files in $BASE/clusters/$1"
+    mkdir -p "clusters/$1"
+    cp example/hosts.multi-node "clusters/$1/hosts"
+    sed -i "s/_cluster_name_/$1/g" "clusters/$1/hosts"
+    cp example/config.yml "clusters/$1/config.yml"
+
+    # sed -i  -e "s/__calico__/$calicoVer/g" \
+	#    -e "s/__cilium__/$ciliumVer/g"
+
+    info "cluster $1: files successfully created."
+}
+
+function ctrimage() {
+    [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+
+    ansible-playbook -i "$BASE/clusters/$1/hosts" "$BASE/playbooks/01.ctrimage.yml" -e "clusters/$1/config.yml"
+}
+
+### Main Lines ##################################################
+function main() {
+  info "Current base directory: $BASE"
+  [[ -d "$BASE" ]] || { error "invalid dir:$BASE"; exit 1; }
+  cd "$BASE"
+
+  # check bash shell
+  readlink /proc/$$/exe|grep -q "bash" || { error "you should use bash shell only"; exit 1; }
+
+  # check 'ansible' executable
+  which ansible > /dev/null 2>&1 || { error "need 'ansible', try: 'pip install ansible'"; usage; exit 1; }
+  
+  [ "$#" -gt 0 ] || { usage >&2; exit 2; }
+  
+  case "$1" in
+      ### in-cluster operations #####################
+      (new)
+          info "new"
+          [ "$#" -gt 1 ] || { usage >&2; exit 2; }
+          new "${@:2}"
+          ;;
+      ### in-cluster operations #####################
+      (ctrimage-load)
+          info "ctrimage-load"
+          [ "$#" -gt 1 ] || { usage >&2; exit 2; }
+          ctrimage "${@:2}"
+          ;;
+      (*)
+          usage
+          exit 0
+          ;;
+  esac
+ }
+
+main "$@"

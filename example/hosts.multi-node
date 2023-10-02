@@ -1,0 +1,21 @@
+# master node(s), set unique 'k8s_nodename' for each node
+# CAUTION: 'k8s_nodename' must consist of lower case alphanumeric characters, '-' or '.',
+# and must start and end with an alphanumeric character
+[cluster_master]
+# 192.168.1.1 k8s_nodename='master-01'
+
+# work node(s), set unique 'k8s_nodename' for each node
+# CAUTION: 'k8s_nodename' must consist of lower case alphanumeric characters, '-' or '.',
+# and must start and end with an alphanumeric character
+[cluster_node]
+# 192.168.1.4 k8s_nodename='worker-01'
+
+[all:vars]
+# Deploy Directory (kubeasz workspace)
+base_dir="/etc/ezansi"
+
+# Directory for a specific cluster
+cluster_dir="{{ base_dir }}/clusters/_cluster_name_"
+
+# Default python interpreter
+# ansible_python_interpreter=/usr/bin/python3
