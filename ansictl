@@ -128,7 +128,10 @@ function usage() {
     echo -e "\033[33mUsage:\033[0m ezctl COMMAND [args]"
     cat <<EOF
 -------------------------------------------------------------------------------------
-Use "ezansi <command>"
+Cluster ops:
+    ctrimage-load    <cluster>  <ip>      to load image for all nodes
+    
+Use "ansictl <command>"
 EOF
 }
 

@@ -1,9 +1,20 @@
-- name: Create directories
+# - name: Create directories
+#   # file: name={{ item }} state=directory
+#   copy: src={{ item }} dest={{ cluster_dir }}/down mode=755 checksum="{{ src_file.stat.checksum }}"
+#   with_items:
+#     - "{{cluster_dir}}/down/images"
+#     - "{{cluster_dir}}/down/ctrimages"
+#   when: (item.src | stat).changed or not (item.dest | stat).exists
+
+- name: Synchronize directories
   # file: name={{ item }} state=directory
-  copy: src={{ item }} dest={{ cluster_dir }}/down mode=755
+  synchronize: 
+    mode: push
+    src: "{{ item }}" 
+    dest: "{{ cluster_dir }}/down"
   with_items:
-  - "{{cluster_dir}}/down/images"
-  - "{{cluster_dir}}/down/ctrimages"
+    - "{{cluster_dir}}/down/images"
+    - "{{cluster_dir}}/down/ctrimages"
 
 - name: Use ctr command to load images located in {{cluster_dir}}/down/ctrimages
   ansible.builtin.shell: |

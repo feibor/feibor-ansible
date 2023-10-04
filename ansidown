@@ -11,7 +11,7 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-EZANSI=1.0.0
+EZANSI=1.0.1
 
 
 # Constants
@@ -142,6 +142,8 @@ function start_feiboransible_docker() {
       --volume /root/.ssh:/root/.ssh \
       --volume /etc/docker:/etc/docker \
       lipengfei217/ezansi:${EZANSI}
+
+   docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin
 }
 
 function main() {
