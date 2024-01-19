@@ -12,6 +12,15 @@ YELLOW='\033[38;5;3m'
 MAGENTA='\033[38;5;5m'
 CYAN='\033[38;5;6m'
 
+# light_blue="\e[94m"
+MEDIUM_BLUE="\e[34m"
+# dark_blue="\e[36m"
+
+# light_red="\e[91m"
+# medium_red="\e[31m"
+DARK_RED="\e[35m"
+# reset_color="\e[0m"
+
 # Functions
 
 ########################
@@ -23,7 +32,7 @@ CYAN='\033[38;5;6m'
 #########################
 stderr_print() {
     # 'is_boolean_yes' is defined in libvalidations.sh, but depends on this file so we cannot source it
-    local bool="${BITNAMI_QUIET:-false}"
+    local bool="${FEIBOR_QUIET:-false}"
     # comparison is performed without regard to the case of alphabetic characters
     shopt -s nocasematch
     if ! [[ "$bool" = 1 || "$bool" =~ ^(yes|true)$ ]]; then
@@ -68,13 +77,16 @@ warn() {
 # Returns:
 #   None
 #########################
+commandlog() {
+    log "${MEDIUM_BLUE}COMMAND${RESET} ==> ${*}"
+}
 error() {
     log "${RED}ERROR${RESET} ==> ${*}"
 }
 ########################
 # Log a 'debug' message
 # Globals:
-#   BITNAMI_DEBUG
+#   FEIBOR_DEBUG
 # Arguments:
 #   None
 # Returns:
@@ -82,7 +94,7 @@ error() {
 #########################
 debug() {
     # 'is_boolean_yes' is defined in libvalidations.sh, but depends on this file so we cannot source it
-    local bool="${BITNAMI_DEBUG:-false}"
+    local bool="${FEIBOR_DEBUG:-false}"
     # comparison is performed without regard to the case of alphabetic characters
     shopt -s nocasematch
     if [[ "$bool" = 1 || "$bool" =~ ^(yes|true)$ ]]; then
