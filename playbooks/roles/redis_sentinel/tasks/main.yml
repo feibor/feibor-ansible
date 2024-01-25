@@ -2,10 +2,10 @@
   # file: name={{ item }} state=directory
   synchronize: 
     mode: push
-    src: "{{ base_dir }}/2.middleware/redis" 
-    dest: "{{ redis_cluster_dir }}/down"
+    src: "{{ base_dir }}/2.middleware/1.redis-templates" 
+    dest: "{{ middleware_dir }}/setup_template"
 
-- name: Use ctr command to load images located in {{cluster_dir}}/down/ctrimages
+- name: Use ctr command to load images located in {{middleware_dir}}/setup_template/1.redis-templates
   ansible.builtin.shell: |
-    cd {{cluster_dir}}/down/ctrimages
-    ls -l | grep "gz" | awk '{print $9}' | xargs -I {} ctr -n k8s.io images import {}
+    cd {{middleware_dir}}/setup_template/1.redis-templates
+    ls -l
