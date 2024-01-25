@@ -10,12 +10,20 @@
 [cluster_node]
 # 192.168.1.4 k8s_nodename='worker-01'
 
+[redis_master]
+
+[redis_slave]
+
+[redis_sentinel]
+
 [all:vars]
 # Deploy Directory (kubeasz workspace)
 base_dir="/etc/ezansi"
 
 # Directory for a specific cluster
 cluster_dir="{{ base_dir }}/clusters/_cluster_name_"
+
+redis_cluster_dir="/data/_cluster_name_/redis"
 
 # Default python interpreter
 # ansible_python_interpreter=/usr/bin/python3

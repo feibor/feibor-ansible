@@ -1,0 +1,11 @@
+- name: Synchronize directories
+  # file: name={{ item }} state=directory
+  synchronize: 
+    mode: push
+    src: "{{ base_dir }}/2.middleware/redis" 
+    dest: "{{ redis_cluster_dir }}/down"
+
+- name: Use ctr command to load images located in {{cluster_dir}}/down/ctrimages
+  ansible.builtin.shell: |
+    cd {{cluster_dir}}/down/ctrimages
+    ls -l | grep "gz" | awk '{print $9}' | xargs -I {} ctr -n k8s.io images import {}

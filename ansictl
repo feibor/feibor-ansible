@@ -122,16 +122,24 @@ indent() {
     echo "$string" | sed "s/^/${indent_unit}/"
 }
 
-
-
 function usage() {
     echo -e "\033[33mUsage:\033[0m ezctl COMMAND [args]"
     cat <<EOF
 -------------------------------------------------------------------------------------
 Cluster ops:
     ctrimage-load    <cluster>  <ip>      to load image for all nodes
-    
-Use "ansictl <command>"
+    setup            <cluster>  <step>    Set up installations of applications, also supporting them step-to-step. 
+Use "ansictl <command>" for more information. 
+EOF
+}
+
+function usage-setup(){
+    echo -e "\033[33mUsage:\033[0m ezansi setup <cluster> <step>"
+    cat <<EOF
+available variables:
+        01 redis-deploy to install redis cluster
+
+examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis-deploy)
 EOF
 }
 
@@ -153,8 +161,21 @@ function new() {
 
 function ctrimage() {
     [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+    ansible-playbook -i "$BASE/clusters/$1/hosts" "$BASE/playbooks/101.ctrimage.yml" -e "clusters/$1/config.yml"
+}
 
-    ansible-playbook -i "$BASE/clusters/$1/hosts" "$BASE/playbooks/01.ctrimage.yml" -e "clusters/$1/config.yml"
+function redis_deployment(){
+    [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+     ansible-playbook -i "$BASE/clusters/$1/hosts" "$BASE/playbooks/02.redis_sentinel.yml" -e "clusters/$1/config.yml"
+}
+
+function setup(){
+    [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+    PLAY_BOOK="dummy.yml"
+    case "$2" in
+       (01|redis)
+           PLAY_BOOK="02.redis_sentinel.yml"
+           ;;
 }
 
 ### Main Lines ##################################################
@@ -174,7 +195,7 @@ function main() {
   case "$1" in
       ### in-cluster operations #####################
       (new)
-          info "new"
+          info "Create a new cluster"
           [ "$#" -gt 1 ] || { usage >&2; exit 2; }
           new "${@:2}"
           ;;
@@ -182,8 +203,11 @@ function main() {
       (ctrimage-load)
           info "ctrimage-load"
           [ "$#" -gt 1 ] || { usage >&2; exit 2; }
-          ctrimage "${@:2}"
+          redis_deployment "${@:2}"
           ;;
+      (setup)
+          info "redis deployment"
+          
       (*)
           usage
           exit 0

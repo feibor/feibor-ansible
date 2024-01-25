@@ -43,7 +43,7 @@ function start_feiboransible_docker() {
       --name ezansi \
       --network host \
       --restart always \
-      --volume $BASE:/etc/ezansi \
+      --volume $EZANSI_PATH:$EZANSI_PATH \
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker \
       lipengfei217/ezansi:${EZANSI}
@@ -53,11 +53,10 @@ function start_feiboransible_docker() {
       --name ezansi \
       --network host \
       --restart always \
-      --volume $BASE:/etc/ezansi \
+      --volume $EZANSI_PATH:$EZANSI_PATH \
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker \
       lipengfei217/ezansi:${EZANSI}
-
    docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin
 }
 
