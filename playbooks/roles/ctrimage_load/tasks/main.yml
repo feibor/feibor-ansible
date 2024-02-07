@@ -20,3 +20,4 @@
   ansible.builtin.shell: |
     cd {{cluster_dir}}/down/ctrimages
     ls -l | grep "gz" | awk '{print $9}' | xargs -I {} ctr -n k8s.io images import {}
+

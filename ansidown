@@ -17,47 +17,42 @@ EZANSI=1.0.1
 EZANSI_PATH=/etc/ezansi
 SSH_PATH=/root/.ssh
 
+function usage() {
+    echo -e "\033[33mUsage:\033[0m ezctl COMMAND [args]"
+    cat <<EOF
+-------------------------------------------------------------------------------------
+flags:
+    -S            to start ezansi docker container.
+    -download     to download all materials that are needed from somewhere. 
+Use "ansictl <command>" for more information. 
+EOF
+}
+
 function run_ezansi_container() {
  start_feiboransible_docker
 }
 
 function start_feiboransible_docker() {
-
-#   # get host's IP
-#   host_if=$(ip route|grep default|head -n1|cut -d' ' -f5)
-#   host_ip=$(ip a|grep "$host_if$"|head -n1|awk '{print $2}'|cut -d'/' -f1)
-
-#   # If retrieval fails, prompt the user to input an IP address
-#   if [ -z "$host_if" ]; then
-#     read -p "Unable to retrieve the default gateway interface. Please enter an IP address: " host_if
-#     echo "User input IP address: $"
-#     # Further operations can be performed using the user input IP address here
-#   else
-#     info "Use default gateway interface: $host_if"
-#     # Further operations can be performed using the default gateway interface here
-#   fi
-
   # run kubeasz docker container
+  commandlog "docker run --detach \
+      --name ezansi \
+      --network host \
+      --restart always \
+      --volume $EZANSI_PATH:$EZANSI_PATH \
+      --volume $SSH_PATH:/root/.ssh \
+      --volume /etc/docker:/etc/docker \
+      lipengfei217/ezansi:${EZANSI}"
 
-  info " docker run --detach \
-      --name ezansi \
-      --network host \
-      --restart always \
-      --volume $EZANSI_PATH:$EZANSI_PATH \
-      --volume $SSH_PATH:/root/.ssh \
-      --volume /etc/docker:/etc/docker \
-      lipengfei217/ezansi:${EZANSI}
-"
   docker run --detach \
-    #   --env HOST_IP="$host_ip" \
       --name ezansi \
       --network host \
       --restart always \
       --volume $EZANSI_PATH:$EZANSI_PATH \
       --volume $SSH_PATH:/root/.ssh \
-      --volume /etc/docker:/etc/docker \
-      lipengfei217/ezansi:${EZANSI}
-   docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin
+      --volume /etc/docker:/etc/docker lipengfei217/ezansi:${EZANSI}
+
+  commandlog "docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin"
+  docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin
 }
 
 function main() {
@@ -72,7 +67,7 @@ function main() {
     ACTION=""
     while getopts "CDP:RSX:d:e:k:m:z:" OPTION; do
         case "$OPTION" in
-            R)
+            S)
             ACTION="run_ezansi_container"
             ;;
             ?)

@@ -127,7 +127,8 @@ function usage() {
     cat <<EOF
 -------------------------------------------------------------------------------------
 Cluster ops:
-    ctrimage-load    <cluster>  <ip>      to load image for all nodes
+    new              <cluster name>       To create a new cluster directory under $BASE/clusters
+    ctrimage-load    <cluster>  <ip>      To load image for all nodes
     setup            <cluster>  <step>    Set up installations of applications, also supporting them step-to-step. 
 Use "ansictl <command>" for more information. 
 EOF
@@ -171,11 +172,35 @@ function redis_deployment(){
 
 function setup(){
     [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+       # for extending usage
+    EXTRA_ARGS=$(echo "$*"|sed "s/$1 $2//g"|sed "s/^ *//g")
     PLAY_BOOK="dummy.yml"
+
     case "$2" in
        (01|redis)
            PLAY_BOOK="02.redis_sentinel.yml"
            ;;
+       (*)
+           usage-setup
+           exit 1
+           ;;
+    esac
+    
+    COMMAND="ansible-playbook -i $BASE/clusters/$1/hosts $BASE/playbooks/$PLAY_BOOK -e clusters/$1/config.yml"
+    info "$COMMAND"
+
+    cat <<EOF
+*** Redis Version *********************
+*******************************************
+*   Redis: ${}
+*   Deployment Mode: ${etcd_ver}
+*******************************************
+EOF
+
+    info "cluster:$1 setup step:$2 begins in 5s, press any key to abort:\n"
+    ! (read -r -t5 -n1) || { warn "setup abort"; return 1; }
+
+    ${COMMAND} || return 1
 }
 
 ### Main Lines ##################################################
@@ -207,7 +232,7 @@ function main() {
           ;;
       (setup)
           info "redis deployment"
-          
+          setup "${@:2}"
       (*)
           usage
           exit 0

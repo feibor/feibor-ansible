@@ -22,7 +22,7 @@ base_dir="/etc/ezansi"
 
 # Directory for a specific cluster
 cluster_dir="{{ base_dir }}/clusters/_cluster_name_"
-
+base_material_dir="{{ base_dir }}/99.Deployment_Materials"
 middleware_dir="/data/clusters/_cluster_name_"
 
 # Default python interpreter

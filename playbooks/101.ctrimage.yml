@@ -1,5 +1,8 @@
 - hosts:
   - cluster_master
   - cluster_node
+  # remote_user: root
+  # port: 22
+  
   roles:
     - ctrimage_load

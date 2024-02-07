@@ -2,7 +2,7 @@
   # file: name={{ item }} state=directory
   synchronize: 
     mode: push
-    src: "{{ base_dir }}/2.middleware/1.redis-templates" 
+    src: "{{ base_material_dir }}/2.middleware/1.redis-templates" 
     dest: "{{ middleware_dir }}/setup_template"
 
 - name: Use ctr command to load images located in {{middleware_dir}}/setup_template/1.redis-templates
