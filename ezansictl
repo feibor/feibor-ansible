@@ -10,8 +10,8 @@
 set -o nounset
 set -o errexit
 
-source ./scripts/liblog.sh
-source ./scripts/env.sh
+source $EZANSI_BASE_PATH/scripts/liblog.sh
+source $EZANSI_BASE_PATH/scripts/env.sh
 
 # Constants
 RESET='\033[0m'
@@ -39,9 +39,9 @@ function usage-setup(){
     echo -e "\033[33mUsage:\033[0m ezansi setup <cluster> <step>"
     cat <<EOF
 available variables:
-        01 redis-deploy to install redis cluster
+        01 redis to install redis cluster
 
-examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis-deploy)
+examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis)
 EOF
 }
 
@@ -62,14 +62,14 @@ function new() {
 }
 
 function ctrimage() {
-    [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+   [[ -d "clusters/$1" ]] || { error "invalid config, You need to create cluster first, run 'ezansi new <your cluster name>' first"; return 1; }
     ansible-playbook -i "$EZANSI_BASE_PATH/clusters/$1/hosts" "$EZANSI_BASE_PATH/playbooks/101.ctrimage.yml" -e "clusters/$1/config.yml"
 }
 
 function setup(){
     echo "================================================================"
 
-    [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
+    [[ -d "clusters/$1" ]] || { error "invalid config, You need to create cluster first, run 'ezansi new <your cluster name>' first"; return 1; }
        # for extending usage
     EXTRA_ARGS=$(echo "$*"|sed "s/$1 $2//g"|sed "s/^ *//g")
     PLAY_BOOK="dummy.yml"
@@ -130,6 +130,8 @@ function main() {
           ;;
       (setup)
           info "redis deployment"
+
+          [ "$#" -gt 2 ] || { error "The number of your arguments for 'setup' command is incorrect" ;usage-setup >&2; exit 2; }
           setup "${@:2}"
           ;;
       (*)

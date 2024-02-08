@@ -14,15 +14,16 @@ set -o pipefail
 source ./scripts/liblog.sh
 source ./scripts/env.sh
 
+EZANSI_CONTAINER_NAME="feiboransi"
+
 
 function usage() {
     echo -e "\033[33mUsage:\033[0m ezctl COMMAND [args]"
     cat <<EOF
 -------------------------------------------------------------------------------------
 flags:
-    -S            to start ezansi docker container.
-    -download     to download all materials that are needed from somewhere. 
-Use "ansictl <command>" for more information. 
+    -S            to start $EZANSI_BASE_PATH docker container.
+Use "ezansictl <command>" for more information. 
 EOF
 }
 
@@ -33,24 +34,28 @@ function run_ezansi_container() {
 function start_feiboransible_docker() {
   # run kubeasz docker container
   commandlog "docker run --detach \
-      --name feiboransi \
+      --name $EZANSI_CONTAINER_NAME \
       --network host \
       --restart always \
-      --volume $EZANSI_PATH:$EZANSI_PATH \
+      --env EZANSI_BASE_PATH=$EZANSI_BASE_PATH \
+      --volume $EZANSI_BASE_PATH:$EZANSI_BASE_PATH \
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker \
       lipengfei217/ezansi:${EZANSI}"
 
   docker run --detach \
-      --name feiboransi \
+      --name $EZANSI_CONTAINER_NAME \
       --network host \
       --restart always \
-      --volume $EZANSI_PATH:$EZANSI_PATH \
+      --env EZANSI_BASE_PATH=$EZANSI_BASE_PATH \
+      --volume $EZANSI_BASE_PATH:$EZANSI_BASE_PATH \
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker lipengfei217/ezansi:${EZANSI}
 
-  commandlog "docker exec ezansi install -o root -g root $EZANSI_BASE_PATH/ansictl /usr/bin"
-  docker exec ezansi install -o root -g root $EZANSI_BASE_PATH/ansictl /usr/bin
+  commandlog "docker exec $EZANSI_CONTAINER_NAME install -o root -g root $EZANSI_BASE_PATH/ezansictl /usr/bin"
+  docker exec $EZANSI_CONTAINER_NAME chmod +x $EZANSI_BASE_PATH/ezansictl
+  docker exec $EZANSI_CONTAINER_NAME ln -s $EZANSI_BASE_PATH/ezansictl /usr/bin
+  docker exec $EZANSI_CONTAINER_NAME ln -s $EZANSI_BASE_PATH/scripts /usr/bin
 }
 
 function main() {
@@ -64,16 +69,16 @@ function main() {
     while getopts "CDP:RSX:d:e:k:m:z:" OPTION; do
         case "$OPTION" in
             S)
-            ACTION="run_ezansi_container"
-            ;;
-            ?)
-            echo "Error action"
-            exit 1
-            ;;
+                ACTION="run_ezansi_container"
+                ;;
+            (*)
+                usage
+                exit 0
+                ;;
         esac
     done
     
-    [[ "$ACTION" == "" ]] && { error "illegal option"; exit 1; }
+    [[ "$ACTION" == "" ]] && { error "illegal option"; usage ;exit 1; }
         
     # excute cmd "$ACTION" 
     info "Action begin: $ACTION"

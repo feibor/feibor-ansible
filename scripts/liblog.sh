@@ -3,7 +3,6 @@
 # SPDX-License-Identifier: APACHE-2.0
 #
 # Library for logging functions
-
 # Constants
 RESET='\033[0m'
 RED='\033[38;5;1m'
@@ -11,18 +10,14 @@ GREEN='\033[38;5;2m'
 YELLOW='\033[38;5;3m'
 MAGENTA='\033[38;5;5m'
 CYAN='\033[38;5;6m'
-
 # light_blue="\e[94m"
 MEDIUM_BLUE="\e[34m"
 # dark_blue="\e[36m"
-
 # light_red="\e[91m"
 # medium_red="\e[31m"
 DARK_RED="\e[35m"
 # reset_color="\e[0m"
-
 # Functions
-
 ########################
 # Print to STDERR
 # Arguments:
