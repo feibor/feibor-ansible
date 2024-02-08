@@ -12,10 +12,8 @@ set -o errexit
 set -o pipefail
 
 source ./scripts/liblog.sh
+source ./scripts/env.sh
 
-EZANSI=1.0.1
-EZANSI_BASE_PATH=/etc/feiboransi
-SSH_PATH=/root/.ssh
 
 function usage() {
     echo -e "\033[33mUsage:\033[0m ezctl COMMAND [args]"

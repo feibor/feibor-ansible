@@ -11,9 +11,7 @@ set -o nounset
 set -o errexit
 
 source ./scripts/liblog.sh
-
-EZANSI=1.0.0
-BASE=/etc/ezansi
+source ./scripts/env.sh
 
 # Constants
 RESET='\033[0m'
@@ -30,7 +28,7 @@ function usage() {
     cat <<EOF
 -------------------------------------------------------------------------------------
 Cluster ops:
-    new              <cluster name>       To create a new cluster directory under $BASE/clusters
+    new              <cluster name>       To create a new cluster directory under $EZANSI_BASE_PATH/clusters
     ctrimage-load    <cluster>  <ip>      To load image for all nodes
     setup            <cluster>  <step>    Set up installations of applications, also supporting them step-to-step. 
 Use "ansictl <command>" for more information. 
@@ -49,9 +47,9 @@ EOF
 
 function new() {
     # check if already existed
-    [[ -d "clusters/$1" ]] && { error "cluster:$1 already existed, if cluster:$1 setup failed, try 'rm -rf $BASE/clusters/$1' first!"; exit 1; }
+    [[ -d "clusters/$1" ]] && { error "cluster:$1 already existed, if cluster:$1 setup failed, try 'rm -rf $EZANSI_BASE_PATH/clusters/$1' first!"; exit 1; }
     
-    info "generate custom cluster files in $BASE/clusters/$1"
+    info "generate custom cluster files in $EZANSI_BASE_PATH/clusters/$1"
     mkdir -p "clusters/$1"
     cp example/hosts.multi-node "clusters/$1/hosts"
     sed -i "s/_cluster_name_/$1/g" "clusters/$1/hosts"
@@ -65,7 +63,7 @@ function new() {
 
 function ctrimage() {
     [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
-    ansible-playbook -i "$BASE/clusters/$1/hosts" "$BASE/playbooks/101.ctrimage.yml" -e "clusters/$1/config.yml"
+    ansible-playbook -i "$EZANSI_BASE_PATH/clusters/$1/hosts" "$EZANSI_BASE_PATH/playbooks/101.ctrimage.yml" -e "clusters/$1/config.yml"
 }
 
 function setup(){
@@ -86,7 +84,7 @@ function setup(){
            ;;
     esac
 
-    COMMAND="ansible-playbook -i $BASE/clusters/$1/hosts $BASE/playbooks/$PLAY_BOOK -e clusters/$1/config.yml"
+    COMMAND="ansible-playbook -i $EZANSI_BASE_PATH/clusters/$1/hosts $EZANSI_BASE_PATH/playbooks/$PLAY_BOOK -e clusters/$1/config.yml"
     info "$COMMAND"
 
     cat <<EOF
@@ -105,9 +103,9 @@ EOF
 
 ### Main Lines ##################################################
 function main() {
-  info "Current base directory: $BASE"
-  [[ -d "$BASE" ]] || { error "invalid dir:$BASE"; exit 1; }
-  cd "$BASE"
+  info "Current base directory: $EZANSI_BASE_PATH"
+  [[ -d "$EZANSI_BASE_PATH" ]] || { error "invalid dir:$EZANSI_BASE_PATH"; exit 1; }
+  cd "$EZANSI_BASE_PATH"
 
   # check bash shell
   readlink /proc/$$/exe|grep -q "bash" || { error "you should use bash shell only"; exit 1; }
