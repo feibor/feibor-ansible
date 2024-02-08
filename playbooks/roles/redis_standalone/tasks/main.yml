@@ -1,0 +1,40 @@
+- name: Send the materials of redis-standalone deployment to destination.{{redis_dest_dir}}/
+  copy:
+    src: "{{redis_base_dir}}/1.redis-standalone/"
+    dest: "{{redis_dest_dir}}/"
+    backup: true
+    
+- name: Send the images to destination. 
+  copy: 
+    src: "{{redis_base_dir}}/0.images/"
+    dest: "{{redis_dest_dir}}"
+    backup: false
+
+- name: Send the start, stop, restart &etc. scripts to destination. 
+  copy: 
+    src: "{{redis_base_dir}}/99.scripts/"
+    dest: "{{redis_dest_dir}}/"
+    mode: u+rwx,g+rwx,o=r
+    backup: false
+
+- name: Use docker command to load images that located in {{server_name}}
+  ansible.builtin.shell: |
+    echo "docker load -i {{redis_dest_dir}}/redis.6.2.13.tar.gz"
+    docker load -i {{redis_dest_dir}}/redis.6.2.13.tar.gz
+
+- name: Update redis configurations {{server_name}} 
+  ansible.builtin.shell: |
+    sed -i 's/__server_name__/{{server_name}}/g' {{redis_dest_dir}}/docker-compose.yml
+    sed -i 's/__redis_port__/{{redis_port}}/g' {{redis_dest_dir}}/docker-compose.yml
+    sed -i 's#__redisconf_mount_path__#{{redis_conf_mount}}#g' {{redis_dest_dir}}/docker-compose.yml
+    sed -i 's#__data_mount__#{{redis_data_mount}}#g' {{redis_dest_dir}}/docker-compose.yml
+
+    sed -i 's/__redis_port__/{{redis_port}}/g' {{redis_dest_dir}}/config/redis.conf
+    sed -i 's/__logfile__/{{logfile}}/g' {{redis_dest_dir}}/config/redis.conf
+    sed -i 's/__redis_masterauth__/{{redis_masterauth}}/g' {{redis_dest_dir}}/config/redis.conf
+    sed -i 's/__redis_requirepass__/{{redis_requirepass}}/g' {{redis_dest_dir}}/config/redis.conf
+    sed -i 's/__redis_bind_ip__/{{redis_bind_ip}}/g' {{redis_dest_dir}}/config/redis.conf
+
+- name: Start Redis compose {{server_name}} 
+  ansible.builtin.shell: |
+    sh {{redis_dest_dir}}/start.sh

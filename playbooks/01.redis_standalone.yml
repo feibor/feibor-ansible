@@ -1,0 +1,4 @@
+- hosts:
+  - redis_standalone
+  roles:
+    - redis_standalone

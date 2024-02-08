@@ -39,7 +39,8 @@ function usage-setup(){
     echo -e "\033[33mUsage:\033[0m ezansi setup <cluster> <step>"
     cat <<EOF
 available variables:
-        01 redis to install redis cluster
+        01 redis-standalone to install redis by standalone mode.
+        02 redis to install redis cluster
 
 examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis)
 EOF
@@ -47,12 +48,12 @@ EOF
 
 function new() {
     # check if already existed
-    [[ -d "clusters/$1" ]] && { error "cluster:$1 already existed, if cluster:$1 setup failed, try 'rm -rf $EZANSI_BASE_PATH/clusters/$1' first!"; exit 1; }
+    [[ -d "clusters/$1" ]] && { error "cluster:$1 already existed, path: $EZANSI_BASE_PATH/clusters/$1'"; exit 1; }
     
     info "generate custom cluster files in $EZANSI_BASE_PATH/clusters/$1"
     mkdir -p "clusters/$1"
-    cp example/hosts.multi-node "clusters/$1/hosts"
-    sed -i "s/_cluster_name_/$1/g" "clusters/$1/hosts"
+    cp example/hosts.multi-node.ini "clusters/$1/hosts.ini"
+    sed -i "s/_cluster_name_/$1/g" "clusters/$1/hosts.ini"
     cp example/config.yml "clusters/$1/config.yml"
 
     # sed -i  -e "s/__calico__/$calicoVer/g" \
@@ -63,7 +64,7 @@ function new() {
 
 function ctrimage() {
    [[ -d "clusters/$1" ]] || { error "invalid config, You need to create cluster first, run 'ezansi new <your cluster name>' first"; return 1; }
-    ansible-playbook -i "$EZANSI_BASE_PATH/clusters/$1/hosts" "$EZANSI_BASE_PATH/playbooks/101.ctrimage.yml" -e "clusters/$1/config.yml"
+    ansible-playbook -i "$EZANSI_BASE_PATH/clusters/$1/hosts.ini" "$EZANSI_BASE_PATH/playbooks/101.ctrimage.yml" -e "clusters/$1/config.yml"
 }
 
 function setup(){
@@ -75,8 +76,8 @@ function setup(){
     PLAY_BOOK="dummy.yml"
 
     case "$2" in
-       (01|redis)
-           PLAY_BOOK="01.redis_sentinel.yml"
+       (01|redis-standalone)
+           PLAY_BOOK="01.redis_standalone.yml"
            ;;
        (*)
            usage-setup
@@ -84,7 +85,7 @@ function setup(){
            ;;
     esac
 
-    COMMAND="ansible-playbook -i $EZANSI_BASE_PATH/clusters/$1/hosts $EZANSI_BASE_PATH/playbooks/$PLAY_BOOK -e clusters/$1/config.yml"
+    COMMAND="ansible-playbook -i $EZANSI_BASE_PATH/clusters/$1/hosts.ini $EZANSI_BASE_PATH/playbooks/$PLAY_BOOK -e clusters/$1/config.yml"
     info "$COMMAND"
 
     cat <<EOF
