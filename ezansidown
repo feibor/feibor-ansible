@@ -14,7 +14,7 @@ set -o pipefail
 source ./scripts/liblog.sh
 
 EZANSI=1.0.1
-EZANSI_PATH=/etc/ezansi
+EZANSI_BASE_PATH=/etc/feiboransi
 SSH_PATH=/root/.ssh
 
 function usage() {
@@ -51,19 +51,17 @@ function start_feiboransible_docker() {
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker lipengfei217/ezansi:${EZANSI}
 
-  commandlog "docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin"
-  docker exec ezansi install -o root -g root $BASE/ansictl /usr/bin
+  commandlog "docker exec ezansi install -o root -g root $EZANSI_BASE_PATH/ansictl /usr/bin"
+  docker exec ezansi install -o root -g root $EZANSI_BASE_PATH/ansictl /usr/bin
 }
 
 function main() {
-    BASE="$EZANSI_PATH"
-    imageDir="$BASE/down/images"
-    ctrImageDir="$BASE/down/ctrimages"
+    imageDir="$EZANSI_BASE_PATH/down/images"
+    ctrImageDir="$EZANSI_BASE_PATH/down/ctrimages"
     # check if use bash shell
     # readlink /proc/$$/exe|grep -q "bash" || { logger error "you should use bash shell, not sh"; exit 1; }
     # check if use with root
     # [[ "$EUID" -ne 0 ]] && { logger error "you should run this script as root"; exit 1; }
-
     ACTION=""
     while getopts "CDP:RSX:d:e:k:m:z:" OPTION; do
         case "$OPTION" in

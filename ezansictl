@@ -171,6 +171,8 @@ function redis_deployment(){
 }
 
 function setup(){
+    echo "================================================================"
+
     [[ -d "clusters/$1" ]] || { error "invalid config, run 'ezansi new $1' first"; return 1; }
        # for extending usage
     EXTRA_ARGS=$(echo "$*"|sed "s/$1 $2//g"|sed "s/^ *//g")
@@ -178,22 +180,22 @@ function setup(){
 
     case "$2" in
        (01|redis)
-           PLAY_BOOK="02.redis_sentinel.yml"
+           PLAY_BOOK="01.redis_sentinel.yml"
            ;;
        (*)
            usage-setup
            exit 1
            ;;
     esac
-    
+
     COMMAND="ansible-playbook -i $BASE/clusters/$1/hosts $BASE/playbooks/$PLAY_BOOK -e clusters/$1/config.yml"
     info "$COMMAND"
 
     cat <<EOF
 *** Redis Version *********************
 *******************************************
-*   Redis: ${}
-*   Deployment Mode: ${etcd_ver}
+*   Redis: 
+*   Deployment Mode: 
 *******************************************
 EOF
 
@@ -233,6 +235,7 @@ function main() {
       (setup)
           info "redis deployment"
           setup "${@:2}"
+          ;;
       (*)
           usage
           exit 0
