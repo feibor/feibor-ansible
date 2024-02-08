@@ -35,7 +35,7 @@ function run_ezansi_container() {
 function start_feiboransible_docker() {
   # run kubeasz docker container
   commandlog "docker run --detach \
-      --name ezansi \
+      --name feiboransi \
       --network host \
       --restart always \
       --volume $EZANSI_PATH:$EZANSI_PATH \
@@ -44,7 +44,7 @@ function start_feiboransible_docker() {
       lipengfei217/ezansi:${EZANSI}"
 
   docker run --detach \
-      --name ezansi \
+      --name feiboransi \
       --network host \
       --restart always \
       --volume $EZANSI_PATH:$EZANSI_PATH \
