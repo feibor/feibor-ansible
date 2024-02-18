@@ -39,6 +39,7 @@ function start_feiboransible_docker() {
       --restart always \
       --env EZANSI_BASE_PATH=$EZANSI_BASE_PATH \
       --volume $EZANSI_BASE_PATH:$EZANSI_BASE_PATH \
+      --volume $EZANSI_MATERIALS_PATH:/data/99.Deployment_Materials \
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker \
       lipengfei217/ezansi:${EZANSI}"
@@ -49,6 +50,7 @@ function start_feiboransible_docker() {
       --restart always \
       --env EZANSI_BASE_PATH=$EZANSI_BASE_PATH \
       --volume $EZANSI_BASE_PATH:$EZANSI_BASE_PATH \
+      --volume $EZANSI_MATERIALS_PATH:/data/99.Deployment_Materials \
       --volume $SSH_PATH:/root/.ssh \
       --volume /etc/docker:/etc/docker lipengfei217/ezansi:${EZANSI}
 

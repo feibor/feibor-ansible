@@ -1,0 +1,4 @@
+- hosts:
+  - redis_slave
+  roles:
+    - redis_slave

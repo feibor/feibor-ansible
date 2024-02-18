@@ -1,5 +1,0 @@
-- hosts:
-  - cluster_master
-  - cluster_node
-  roles:
-    - redis_sentinel

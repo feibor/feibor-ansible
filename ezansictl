@@ -39,10 +39,11 @@ function usage-setup(){
     echo -e "\033[33mUsage:\033[0m ezansi setup <cluster> <step>"
     cat <<EOF
 available variables:
-        01 redis-standalone to install redis by standalone mode.
-        02 redis to install redis cluster
+        01 redis-standalone to install redis by standalone mode
+        02 redis-master to install redis master by cluster master-slave mode
+        03 redis-slave to install redis slave by cluster master-slave mode
 
-examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis)
+examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis-standalone)
 EOF
 }
 
@@ -78,6 +79,12 @@ function setup(){
     case "$2" in
        (01|redis-standalone)
            PLAY_BOOK="01.redis_standalone.yml"
+           ;;
+       (02|redis-master)
+           PLAY_BOOK="02.redis_master.yml"
+           ;;
+       (03|redis-slave)
+           PLAY_BOOK="03.redis_slave.yml"
            ;;
        (*)
            usage-setup
