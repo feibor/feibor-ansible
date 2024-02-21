@@ -42,7 +42,6 @@ available variables:
         01 redis-standalone to install redis by standalone mode
         02 redis-master to install redis master by cluster master-slave mode
         03 redis-slave to install redis slave by cluster master-slave mode
-        04 redis-sentinel to install redis sentinel by cluster master-slave-sentinel mode
 
 examples: ./ezansi setup test-cluster 01 (or ./ezansi setup test-cluster redis-standalone)
 EOF
@@ -86,9 +85,6 @@ function setup(){
            ;;
        (03|redis-slave)
            PLAY_BOOK="03.redis_slave.yml"
-           ;;
-       (04|redis-sentinel)
-           PLAY_BOOK="04.redis_sentinel.yml"
            ;;
        (*)
            usage-setup

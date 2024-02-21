@@ -1,0 +1,29 @@
+# If set "0.0.0.0" means for all connections.
+bind __redis_bind_ip__
+port __redis_port__
+# redis-{{redis_port}}.log
+logfile "__logfile__"
+daemonize no
+masterauth "__redis_masterauth__"
+requirepass "__redis_requirepass__"
+
+replicaof __redis_master_ip__ __redis_master_port__
+
+# replica-announce-ip: 
+# Specifies the IP address that the replica announces 
+# to the master and other replicas. 
+# This configuration is very useful if the replica has multiple 
+# network interfaces or if you need to ensure that the master 
+# communicates with the replica through a specific IP address.
+replica-announce-ip "__redis_announce_ip__"
+
+# replica-announce-port:
+# Specifies the port number that the replica announces 
+# to the master and other replicas. 
+# If the replica is listening on a port other than the default Redis port (6379), 
+# or for security reasons is operating on a non-standard port, 
+# this configuration will inform the master and other replicas which port 
+# should be used to establish connections.
+replica-announce-port __redis_announce_port__
+
+

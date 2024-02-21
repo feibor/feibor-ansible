@@ -1,0 +1,18 @@
+version: '3'
+services:
+  # master1配置
+  __server_name__:
+    image: redis:6.2.13
+    sysctls:
+      - net.core.somaxconn=511
+    container_name: __server_name__
+    restart: always
+    environment: # 环境变量
+      - TZ=Asia/Shanghai
+    ports:
+      - __host_redis_port__:6379
+    privileged: true # 拥有容器内命令执行的权限
+    volumes: #文件挂载
+      - __redisconf_mount_path__:/usr/local/etc/redis
+      - __data_mount__:/data
+    command: sh -c "redis-server /usr/local/etc/redis/redis.conf"
