@@ -1,0 +1,4 @@
+- hosts:
+  - redis_sentinel
+  roles:
+    - redis_sentinel
