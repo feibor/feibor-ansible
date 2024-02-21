@@ -6,21 +6,20 @@
     
 - name: Send the images to destination. 
   copy: 
-    src: "{{redis_base_dir}}/0.images/"
-    dest: "{{redis_dest_dir}}"
+    src: "{{redis_image_dir}}"
+    dest: "{{redis_dest_dir}}/images/"
     backup: false
 
 - name: Send the start, stop, restart &etc. scripts to destination. 
   copy: 
     src: "{{redis_base_dir}}/99.scripts/"
-    dest: "{{redis_dest_dir}}/"
+    dest: "{{redis_dest_dir}}"
     mode: u+rwx,g+rwx,o=r
     backup: false
 
 - name: Use docker command to load images that located in {{server_name}}
   ansible.builtin.shell: |
-    echo "docker load -i {{redis_dest_dir}}/redis.6.2.13.tar.gz"
-    docker load -i {{redis_dest_dir}}/redis.6.2.13.tar.gz
+    docker load -i {{redis_dest_dir}}/images/{{redis_image_file_name}}
 
 - name: Update redis configurations {{server_name}} 
   ansible.builtin.shell: |
