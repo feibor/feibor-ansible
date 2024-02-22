@@ -36,7 +36,10 @@
     sed -i 's/__redis_bind_ip__/{{redis_bind_ip}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__slave-serve-stale-data__/{{slave_serve_stale_data}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__slave-read-only__/{{slave_read_only}}/g' {{redis_dest_dir}}/config/redis.conf
-    
+
+    sed -i 's/__cluster_announce_ip__/{{cluster_announce_ip}}/g' {{redis_dest_dir}}/config/redis.conf
+    sed -i 's/__cluster_announce_port__/{{cluster_announce_port}}/g' {{redis_dest_dir}}/config/redis.conf
+
     sed -i 's/__redis_master_ip__/{{redis_master_ip}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__redis_master_port__/{{redis_master_port}}/g' {{redis_dest_dir}}/config/redis.conf
     

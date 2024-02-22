@@ -35,6 +35,9 @@
     sed -i 's/__redis_requirepass__/{{redis_requirepass}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__redis_bind_ip__/{{redis_bind_ip}}/g' {{redis_dest_dir}}/config/redis.conf
 
+    sed -i 's/__cluster_announce_ip__/{{cluster_announce_ip}}/g' {{redis_dest_dir}}/config/redis.conf
+    sed -i 's/__cluster_announce_port__/{{cluster_announce_port}}/g' {{redis_dest_dir}}/config/redis.conf
+
 
 - name: Start Redis compose {{server_name}} 
   ansible.builtin.shell: |
