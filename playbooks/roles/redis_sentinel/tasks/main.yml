@@ -34,7 +34,8 @@
     sed -i 's/__redis_master_ip__/{{redis_master_ip}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__redis_master_port__/{{redis_master_port}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__at_least_agree_num__/{{at_least_agree_num}}/g' {{redis_dest_dir}}/config/redis.conf
-    
+    sed -i 's/__host_redis_port__/{{host_redis_port}}/g' {{redis_dest_dir}}/config/redis.conf
+
     sed -i 's/__sentinel_announce_ip__/{{sentinel_announce_ip}}/g' {{redis_dest_dir}}/config/redis.conf
     sed -i 's/__sentinel_announce_port__/{{sentinel_announce_port}}/g' {{redis_dest_dir}}/config/redis.conf
     
